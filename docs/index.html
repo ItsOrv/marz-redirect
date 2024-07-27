@@ -1,39 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Proxy Request Page</title>
-</head>
-<body>
-    <h1>Proxy Request Page</h1>
-    <form id="proxyForm">
-        <label for="path">Path:</label>
-        <input type="text" id="path" name="path">
-        <button type="submit">Send Request</button>
-    </form>
-    <div id="response"></div>
-
+    <title>Proxy Redirect</title>
     <script>
-        document.getElementById('proxyForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const path = document.getElementById('path').value;
-
-            fetch('http://194.36.171.20:8000/proxy', {  // آدرس سرور پروکسی شما
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `path=${encodeURIComponent(path)}`,
-            })
-            .then(response => response.json())
-            .then(data => {
-                const responseDiv = document.getElementById('response');
-                responseDiv.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
-            })
-            .catch(error => {
-                const responseDiv = document.getElementById('response');
-                responseDiv.innerHTML = `<pre>${error}</pre>`;
-            });
+        document.addEventListener("DOMContentLoaded", function() {
+            const path = window.location.pathname.substring(1); // Remove leading '/'
+            if (path) {
+                const proxyUrl = `http://194.36.171.20:8000/${path}`;
+                
+                fetch(proxyUrl)
+                    .then(response => response.text())
+                    .then(data => {
+                        document.documentElement.innerHTML = data;
+                    })
+                    .catch(error => {
+                        document.body.innerHTML = `<pre>${error}</pre>`;
+                    });
+            } else {
+                document.body.innerHTML = '<h1>No path provided</h1>';
+            }
         });
     </script>
+</head>
+<body>
+    <h1>Loading...</h1>
 </body>
 </html>
